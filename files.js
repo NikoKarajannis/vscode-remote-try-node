@@ -43,11 +43,11 @@ fs.mkdir('./assets', (err) => {
 
 
 // delete files
-if (fs.existsSync('./docs/deleteme.txt')) {
-    fs.unlink('./docs/deleteme.txt', (err) => {
+if (fs.existsSync('./docs/delete_me.txt')) {
+    fs.unlink('./docs/delete_me.txt', (err) => {
         if (err) {
             console.log(err);
         }
         console.log('file deleted');
     }   );
-}   // deletes the file called deleteme.txt in the docs folder      // checks if the file exists                        
+}   // deletes the file called delete_me.txt in the docs folder      // checks if the file exists                        
