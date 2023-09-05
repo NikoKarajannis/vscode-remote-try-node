@@ -21,6 +21,7 @@ app.set('view engine', 'ejs');
 
 // middleware & static files
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 /*
@@ -36,10 +37,11 @@ app.use((req, res, next) => {
 
 
 app.get('/add-blog', (req, res) => {
-    const blog = new Blog({ title: 'new blog', 
-                            snippet: 'about my new blog', 
-                            body: 'more about my new blog'  
-                        });
+    const blog = new Blog({ 
+        title: 'new blog 3', 
+        snippet: 'about my new blog', 
+        body: 'more about my new blog'  
+    });
     blog.save()
         .then((result) => {
             res.send(result);
@@ -47,17 +49,33 @@ app.get('/add-blog', (req, res) => {
         .catch((err) => {
             console.log(err);
         });
-}   
-);
+});
+
+
+app.get('/all-blogs', (req, res) => {
+    Blog.find() // find all blogs
+        .then((result) => { // then do something with the result
+            res.send(result);   // send the result to the browser
+        })  
+        .catch((err) => {   // if there is an error
+            console.log(err);   // log the error to the console
+        });
+});
+
+
+app.get('/single-blog', (req, res) => {
+    Blog.findById('64f6de813b1c519bd06ea495') // find a single blog by id
+        .then((result) => { // then do something with the result
+            res.send(result);   // send the result to the browser
+        })
+        .catch((err) => {   // if there is an error
+            console.log(err);   // log the error to the console
+        });
+});
 
 
 app.get('/', (req, res) => {
-    const blogs = [
-        {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-      ];
-    res.render('index', { title: 'Home', blogs });
+    res.redirect('/blogs');
 });
 
 app.get('/about', (req, res) => {    
@@ -69,6 +87,31 @@ app.get('/about', (req, res) => {
 app.get('/about-blah', (req, res) => {
     res.redirect('/about');
 }    
+);
+
+//blog routes
+app.get('/blogs', (req, res) => {   
+    Blog.find().sort({ createdAt: -1 }) // find all blogs and sort them by createdAt in descending order
+        .then((result) => { // then do something with the result
+            res.render('index', { title: 'All blogs', blogs: result });   // send the result to the browser
+        })
+        .catch((err) => {   // if there is an error
+            console.log(err);   // log the error to the console
+        });
+}
+);
+
+app.post('/blogs', (req, res) => {
+    const blog = new Blog(req.body);   // create a new blog, only possible to urlencoded middleware
+    
+    blog.save() // save the blog to the database
+        .then((result) => { // then do something with the result
+            res.redirect('/blogs');   // redirect to the blogs page 
+        })
+        .catch((err) => {   // if there is an error
+            console.log(err);   // log the error to the console
+        });
+}
 );
 
 // blog
